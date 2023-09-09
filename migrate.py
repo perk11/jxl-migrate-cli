@@ -50,7 +50,7 @@ def convert(p, lossy=False, remove=False, losslessjpeg=False):
         '1' if lossy else '0',
         '-j',
         '1' if losslessjpeg else '0'
-    ], capture_output=True)
+    ] + arguments['cjxl_extra_args'], capture_output=True)
 
     if proc.returncode != 0 or not os.path.exists(res):
         return None
@@ -171,6 +171,8 @@ def run():
         print('--lossyjpg: convert JPEG files lossily (-d 1) (default FALSE)')
         print('--lossywebp: convert lossless WebP lossily (-d 1) (default FALSE)')
         print('--lossygif: convert GIF lossily (-d 1) (default FALSE)')
+        print('--cjxl-extra-args: Additional parameters to pass to jxl, e.g. --cjxl-extra-args="-e 8" to set cjxl '
+              'effort to 8')
         exit()
 
     arguments = {
@@ -178,10 +180,15 @@ def run():
         'lossyjpg': False,
         'lossywebp': False,
         'lossygif': False,
-        'source': None
+        'source': None,
+        'cjxl_extra_args': [],
     }
 
-    for arg in sys.argv[1:]:
+    skip_next_argument = False
+    for i, arg in enumerate(sys.argv[1:]):
+        if skip_next_argument:
+            skip_next_argument = False
+            continue
         if arg.startswith('--'):
             if arg == '--delete':
                 arguments['delete'] = True
@@ -191,6 +198,11 @@ def run():
                 arguments['lossywebp'] = True
             elif arg == '--lossygif':
                 arguments['lossygif'] = True
+            elif arg == '--cjxl-extra-args':
+                # split the next argument and add to 'cjxl_extra_args'
+                if i + 1 < len(sys.argv) - 1:
+                    arguments['cjxl_extra_args'] = sys.argv[i + 2].split(' ')
+                    skip_next_argument = True
             else:
                 print('Unrecognized flag: ' + arg)
                 exit()
