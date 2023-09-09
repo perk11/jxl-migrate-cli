@@ -39,7 +39,7 @@ Just run the script on Python while providing the required parameters and it wil
 ### Valid arguments
 
 ```sh
-python migrate.py [directory] [--delete] [--lossyjpg] [--lossywebp] [--lossygif]
+python jxl-migrate-cli.py [directory] [--delete] [--lossyjpg] [--lossywebp] [--lossygif]
 ```
 
 - **directory**: the folder to process (required)
@@ -51,7 +51,7 @@ python migrate.py [directory] [--delete] [--lossyjpg] [--lossywebp] [--lossygif]
 ### Example
 
 ```sh
-python migrate.py /home/kylxbn/Photos --lossyjpg --delete
+python jxl-migrate-cli.py /home/kylxbn/Photos --lossyjpg --delete
 ```
 
 
