@@ -143,6 +143,11 @@ def try_handle_file(filename, root):
     except Exception as inst:
         print('Error processing ' + os.path.join(root, filename) + ': ', repr(inst))
 
+def format_file_size(size_in_bytes):
+    for unit in ['Bytes', 'KB', 'MB', 'GB', 'TB']:
+        if size_in_bytes < 1024.0:
+            return f"{size_in_bytes:.3f} {unit}"
+        size_in_bytes /= 1024.0
 
 def run():
     global arguments
@@ -220,9 +225,11 @@ def run():
     if filesize_before_conversion == 0:
         print('No files were converted')
         exit()
-    print('Before conversion: ' + str(filesize_before_conversion / 1024) + 'KB')
-    print('After conversion: ' + str(filesize_after_conversion / 1024) + 'KB')
-    print('Reduction: ' + str((1 - filesize_after_conversion / filesize_before_conversion) * 100) + '%')
+    print('Before conversion: ' + format_file_size(filesize_before_conversion))
+    print('After conversion: ' + format_file_size(filesize_after_conversion))
+    reduction_percentage = (1 - filesize_after_conversion / filesize_before_conversion) * 100
+
+    print(f"Reduction: {reduction_percentage:.2f}%")
 
 
 if __name__ == '__main__':
