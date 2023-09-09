@@ -51,7 +51,7 @@ python jxl-migrate-cli.py [directory] [--delete] [--lossyjpg] [--lossywebp] [--l
 
 --**lossygif**: convert GIF lossily (-d 1) (default FALSE)
 
---**force**-overwrite: perform conversion even if JXL file already exists
+--**force-overwrite**: perform conversion even if JXL file already exists
 
 --**jobs**: number of jobs (cjxl processes) to use (defaults to CPU core count), e.g. --jobs=8
 
