@@ -171,7 +171,7 @@ def run():
         print('--lossyjpg: convert JPEG files lossily (-d 1) (default FALSE)')
         print('--lossywebp: convert lossless WebP lossily (-d 1) (default FALSE)')
         print('--lossygif: convert GIF lossily (-d 1) (default FALSE)')
-        print('--jobs: number of jobs (cjxl processes) to use (defaults to CPU core count)')
+        print('--jobs: number of jobs (cjxl processes) to use (defaults to CPU core count), e.g. --jobs=8')
         print('--cjxl-extra-args: Additional parameters to pass to jxl, e.g. --cjxl-extra-args="-e 8" to set cjxl '
               'effort to 8')
         exit()
@@ -188,9 +188,6 @@ def run():
 
     skip_next_argument = False
     for i, arg in enumerate(sys.argv[1:]):
-        if skip_next_argument:
-            skip_next_argument = False
-            continue
         if arg.startswith('--'):
             if arg == '--delete':
                 arguments['delete'] = True
@@ -200,22 +197,17 @@ def run():
                 arguments['lossywebp'] = True
             elif arg == '--lossygif':
                 arguments['lossygif'] = True
-            elif arg == '--jobs':
-                if i + 1 < len(sys.argv) - 1:
-                    try:
-                        arguments['jobs'] = int(sys.argv[i + 2])
-                        skip_next_argument = True
-                    except ValueError:
-                        print("Invalid value for --jobs. Must be an integer.")
-                        exit()
-                    if arguments['jobs'] < 1:
-                        print("Invalid value for --jobs. Must be greater than 0.")
-                        exit()
-            elif arg == '--cjxl-extra-args':
-                # split the next argument and add to 'cjxl_extra_args'
-                if i + 1 < len(sys.argv) - 1:
-                    arguments['cjxl_extra_args'] = sys.argv[i + 2].split(' ')
-                    skip_next_argument = True
+            elif arg.startswith('--jobs='):
+                try:
+                    arguments['jobs'] = int(arg.split('=')[1])
+                except ValueError:
+                    print("Invalid value for --jobs. Must be an integer.")
+                    exit()
+                if arguments['jobs'] < 1:
+                    print("Invalid value for --jobs. Must be greater than 0.")
+                    exit()
+            elif arg.startswith('--cjxl-extra-args='):
+                arguments['cjxl_extra_args'] = arg.split('=')[1].split(' ')
             else:
                 print('Unrecognized flag: ' + arg)
                 exit()
