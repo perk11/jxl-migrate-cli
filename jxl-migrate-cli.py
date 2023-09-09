@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-version = 'v0.2'
+version = 'v0.3'
 
 '''
 jxl-migrate - Convert images to JPEG XL (JXL) format
