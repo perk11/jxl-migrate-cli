@@ -160,7 +160,7 @@ def run():
     global arguments
     global version
 
-    print('jxl-migrate - Convert images to JPEG XL (JXL) format\n')
+    print('jxl-migrate-cli - Convert images in a directory to JPEG XL (JXL) format\n')
     print(version)
 
     if len(sys.argv) <= 1:
