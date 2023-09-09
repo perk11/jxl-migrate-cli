@@ -1,6 +1,7 @@
-# jxl-migrate
+# jxl-migrate-cli
 
-`jxl-migrate` is a simple Python 3 script to convert all applicable image files recursively in a folder to JPEG XL (JXL, `image/jxl`).
+`jxl-migrate-cli` is a Python 3 script to convert all applicable image files recursively in a folder to JPEG XL (JXL, `image/jxl`).
+It is based on [kylxbn/jxl-migrate](https://github.com/kylxbn/jxl-migrate) before it was rewritten to be a GUI program.
 
 In case the conversion of an image is successful, the original image can be deleted and the JXL file will be all that's left.
 
@@ -53,15 +54,6 @@ python migrate.py [directory] [--delete] [--lossyjpg] [--lossywebp] [--lossygif]
 python migrate.py /home/kylxbn/Photos --lossyjpg --delete
 ```
 
-## Contributing
-
-I welcome any pull requests that will improve the script. Please feel free to submit pull requests and I'll check them out. There is no coding guide, no rules to follow. As long as you tested your pull request and it works, just submit it! Thanks!
-
-### Contributors!
-
-Thank you very much to everyone who contributed code to this humble Python script. I really appreciate it, and I'm sure everyone trying to adopt JPEG XL appreciates it, too!
-
-[perk11](https://github.com/perk11) - Keep original file mtime in converted JXL, implement multithreading ([#6](https://github.com/kylxbn/jxl-migrate/pull/6))
 
 ## Disclaimer
 
@@ -72,9 +64,3 @@ The detection of file format is done purely by file extension (not case sensitiv
 The script runs assuming you have all requirements satisfied and does not check if there are missing requirements. If a requirement is missing, the script might throw an error and crash. So make sure you have all requirements before running this script.
 
 While I can't think of any bad reason (besides having a left-over PNG file converted from the original WebP with the original WebP file already deleted), cancelling the script by `Ctrl+C` or another way might be harmful and cause corrupted files. You have been warned.
-
-# License
-
-GNU General Public License 3 (GPL-3)
-
-Please check `LICENSE` file for the complete license.
