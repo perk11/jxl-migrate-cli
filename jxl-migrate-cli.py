@@ -158,7 +158,7 @@ def run():
 
     if len(sys.argv) <= 1:
         print('Program usage:')
-        print(sys.argv[0] + ' [directory] [--delete] [--lossyjpg] [--lossywebp] [--lossygif]\n')
+        print(sys.argv[0] + ' [directory] [OPTIONS]\n')
         print('directory: the folder to process')
         print('--delete: delete original source files if conversion succeeded (default FALSE)')
         print('--lossyjpg: convert JPEG files lossily (-d 1) (default FALSE)')

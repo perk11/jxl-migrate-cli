@@ -7,10 +7,11 @@ In case the conversion of an image is successful, the original image can be dele
 
 ## Features
 
-`jxl-migrate` will try to do the following:
+`jxl-migrate-cli` will try to do the following:
 
 * Convert *JPEG and JPG* files into *lossless transcoded or lossy JXL*
 * Convert *PNG* files into *lossless JXL*
+* Convert *APNG* files into *lossless JXL*
 * Convert *lossless WebP* into *lossless or lossy JXL*
 * Convert *lossy WebP* into *lossy JXL* (`-d 1`)
 * Convert *GIF* files into *lossless or lossy animated JXL*
@@ -42,11 +43,13 @@ Just run the script on Python while providing the required parameters and it wil
 python jxl-migrate-cli.py [directory] [--delete] [--lossyjpg] [--lossywebp] [--lossygif]
 ```
 
-- **directory**: the folder to process (required)
-- **--delete**: delete original source file if successfully converted (default FALSE)
-- **--lossyjpg**: convert JPEGs lossily (`-d 1`) instead of lossless transcode (default FALSE)
-- **--lossywebp**: convert lossless WebPs lossily (`-d 1`). Lossy WebPs will always be converted lossily (default FALSE)
-- **--lossygif**: convert GIFs lossily (`-d 1`) (default FALSE)
+--**delete**: delete original source files if conversion succeeded (default FALSE)
+--**lossyjpg**: convert JPEG files lossily (-d 1) (default FALSE)
+--**lossywebp**: convert lossless WebP lossily (-d 1) (default FALSE)
+--**lossygif**: convert GIF lossily (-d 1) (default FALSE)
+--**force**-overwrite: perform conversion even if JXL file already exists
+--**jobs**: number of jobs (cjxl processes) to use (defaults to CPU core count), e.g. --jobs=8
+--**cjxl-extra-args**: Additional parameters to pass to jxl, e.g. --cjxl-extra-args="-e 8" to set cjxl effort to 8
 
 ### Example
 
