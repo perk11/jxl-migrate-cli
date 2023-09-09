@@ -201,10 +201,10 @@ def run():
                 try:
                     arguments['jobs'] = int(arg.split('=')[1])
                 except ValueError:
-                    print("Invalid value for --jobs. Must be an integer.")
+                    print('Invalid value for --jobs. Must be an integer.')
                     exit()
                 if arguments['jobs'] < 1:
-                    print("Invalid value for --jobs. Must be greater than 0.")
+                    print('Invalid value for --jobs. Must be greater than 0.')
                     exit()
             elif arg.startswith('--cjxl-extra-args='):
                 arguments['cjxl_extra_args'] = arg.split('=')[1].split(' ')
