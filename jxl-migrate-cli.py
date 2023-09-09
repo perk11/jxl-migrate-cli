@@ -43,8 +43,7 @@ def is_webp_lossless(p):
     return 'Format: Lossless' in output
 
 
-def convert(p, lossy=False, remove=False, losslessjpeg=False):
-    target_filename = '.'.join(p.split('.')[0:-1]) + '.jxl'
+def convert(p, target_filename, lossy=False, remove=False, losslessjpeg=False):
     proc = subprocess.run(args=[
                                    'cjxl',
                                    p,
@@ -126,7 +125,8 @@ def handle_file(filename, root):
         message += "a lossless"
     message += " JXL"
     print(message)
-    converted_filename = convert(fullpath, lossy, arguments['delete'], losslessjpeg)
+
+    converted_filename = convert(fullpath, jxl_filename, lossy, arguments['delete'], losslessjpeg)
     if converted_filename is None:
         print('Conversion FAILED: ', fullpath)
     else:
@@ -143,11 +143,13 @@ def try_handle_file(filename, root):
     except Exception as inst:
         print('Error processing ' + os.path.join(root, filename) + ': ', repr(inst))
 
+
 def format_file_size(size_in_bytes):
     for unit in ['Bytes', 'KB', 'MB', 'GB', 'TB']:
         if size_in_bytes < 1024.0:
             return f"{size_in_bytes:.3f} {unit}"
         size_in_bytes /= 1024.0
+
 
 def run():
     global arguments
