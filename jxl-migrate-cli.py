@@ -32,6 +32,7 @@ fsafter = 0
 
 arguments = {}
 
+
 def is_webp_lossless(p):
     res = check_output(args=[
         'webpinfo',
@@ -40,17 +41,18 @@ def is_webp_lossless(p):
 
     return 'Format: Lossless' in res
 
+
 def convert(p, lossy=False, remove=False, losslessjpeg=False):
     res = '.'.join(p.split('.')[0:-1]) + '.jxl'
     proc = subprocess.run(args=[
-        'cjxl',
-        p,
-        res,
-        '-d',
-        '1' if lossy else '0',
-        '-j',
-        '1' if losslessjpeg else '0'
-    ] + arguments['cjxl_extra_args'], capture_output=True)
+                                   'cjxl',
+                                   p,
+                                   res,
+                                   '-d',
+                                   '1' if lossy else '0',
+                                   '-j',
+                                   '1' if losslessjpeg else '0'
+                               ] + arguments['cjxl_extra_args'], capture_output=True)
 
     if proc.returncode != 0 or not os.path.exists(res):
         return None
@@ -59,6 +61,7 @@ def convert(p, lossy=False, remove=False, losslessjpeg=False):
         if remove:
             os.remove(p)
         return res
+
 
 def decode(p, remove=False):
     res = '.'.join(p.split('.')[0:-1]) + '.png'
@@ -75,6 +78,8 @@ def decode(p, remove=False):
     else:
         os.utime(res, (time.time(), os.path.getmtime(p)))
         return res
+
+
 def handle_file(filename, root):
     global fsbefore
     global fsafter
@@ -127,11 +132,14 @@ def handle_file(filename, root):
 
     if decoded_png_filename is not None:
         os.remove(decoded_png_filename)
+
+
 def try_handle_file(filename, root):
     try:
         handle_file(filename, root)
     except Exception as inst:
         print('Error processing ' + os.path.join(root, filename) + ': ', repr(inst))
+
 
 def run():
     global arguments
@@ -208,6 +216,7 @@ def run():
     print('Before conversion: ' + str(fsbefore / 1024) + 'KB')
     print('After conversion: ' + str(fsafter / 1024) + 'KB')
     print('Reduction: ' + str((1 - fsafter / fsbefore) * 100) + '%')
+
 
 if __name__ == '__main__':
     run()
