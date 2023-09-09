@@ -212,8 +212,5 @@ def run():
     print('After conversion: ' + str(fsafter / 1024) + 'KB')
     print('Reduction: ' + str((1 - fsafter / fsbefore) * 100) + '%')
 
-    print('Exiting. Press ENTER to continue. Thank you.')
-    input()
-
 if __name__ == '__main__':
     run()
