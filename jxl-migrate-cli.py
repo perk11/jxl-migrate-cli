@@ -27,62 +27,62 @@ from multiprocessing import cpu_count
 from multiprocessing.pool import ThreadPool
 from subprocess import check_output
 
-fsbefore = 0
-fsafter = 0
+filesize_before_conversion = 0
+filesize_after_conversion = 0
 
 arguments = {}
 
 
 def is_webp_lossless(p):
-    res = check_output(args=[
+    output = check_output(args=[
         'webpinfo',
         p
     ], text=True)
 
-    return 'Format: Lossless' in res
+    return 'Format: Lossless' in output
 
 
 def convert(p, lossy=False, remove=False, losslessjpeg=False):
-    res = '.'.join(p.split('.')[0:-1]) + '.jxl'
+    target_filename = '.'.join(p.split('.')[0:-1]) + '.jxl'
     proc = subprocess.run(args=[
                                    'cjxl',
                                    p,
-                                   res,
+                                   target_filename,
                                    '-d',
                                    '1' if lossy else '0',
                                    '-j',
                                    '1' if losslessjpeg else '0'
                                ] + arguments['cjxl_extra_args'], capture_output=True)
 
-    if proc.returncode != 0 or not os.path.exists(res):
+    if proc.returncode != 0 or not os.path.exists(target_filename):
         return None
     else:
-        os.utime(res, (time.time(), os.path.getmtime(p)))
+        os.utime(target_filename, (time.time(), os.path.getmtime(p)))
         if remove:
             os.remove(p)
-        return res
+        return target_filename
 
 
 def decode(p, remove=False):
-    res = '.'.join(p.split('.')[0:-1]) + '.png'
+    temporary_png_filename = '.'.join(p.split('.')[0:-1]) + '.png'
 
     proc = subprocess.run(args=[
         'dwebp',
         p,
         '-o',
-        res
+        temporary_png_filename
     ], capture_output=True)
 
-    if proc.returncode != 0 or not os.path.exists(res):
+    if proc.returncode != 0 or not os.path.exists(temporary_png_filename):
         return None
     else:
-        os.utime(res, (time.time(), os.path.getmtime(p)))
-        return res
+        os.utime(temporary_png_filename, (time.time(), os.path.getmtime(p)))
+        return temporary_png_filename
 
 
 def handle_file(filename, root):
-    global fsbefore
-    global fsafter
+    global filesize_before_conversion
+    global filesize_after_conversion
     global arguments
 
     extension = filename.split('.')[-1].lower()
@@ -127,8 +127,8 @@ def handle_file(filename, root):
     if converted_filename is None:
         print('Conversion FAILED: ', fullpath)
     else:
-        fsbefore += filesize
-        fsafter += os.path.getsize(converted_filename)
+        filesize_before_conversion += filesize
+        filesize_after_conversion += os.path.getsize(converted_filename)
 
     if decoded_png_filename is not None:
         os.remove(decoded_png_filename)
@@ -210,12 +210,12 @@ def run():
     pool.close()
     pool.join()
 
-    if fsbefore == 0:
+    if filesize_before_conversion == 0:
         print('No files were converted')
         exit()
-    print('Before conversion: ' + str(fsbefore / 1024) + 'KB')
-    print('After conversion: ' + str(fsafter / 1024) + 'KB')
-    print('Reduction: ' + str((1 - fsafter / fsbefore) * 100) + '%')
+    print('Before conversion: ' + str(filesize_before_conversion / 1024) + 'KB')
+    print('After conversion: ' + str(filesize_after_conversion / 1024) + 'KB')
+    print('Reduction: ' + str((1 - filesize_after_conversion / filesize_before_conversion) * 100) + '%')
 
 
 if __name__ == '__main__':
