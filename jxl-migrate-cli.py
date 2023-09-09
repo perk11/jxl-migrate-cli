@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import os, sys
 import subprocess
 import time
+import tempfile
 from multiprocessing import cpu_count
 from multiprocessing.pool import ThreadPool
 from subprocess import check_output
@@ -63,12 +64,14 @@ def convert(p, lossy=False, remove=False, losslessjpeg=False):
         return target_filename
 
 
-def decode(p, remove=False):
-    temporary_png_filename = '.'.join(p.split('.')[0:-1]) + '.png'
+def convert_webp_to_temporary_png(webp_filename):
+    temporary_png_filename = tempfile.NamedTemporaryFile(prefix='jxl-migrate-cli-', suffix='.png').name
+
+    print("Converting " + webp_filename + " to a temporary PNG " + temporary_png_filename)
 
     proc = subprocess.run(args=[
         'dwebp',
-        p,
+        webp_filename,
         '-o',
         temporary_png_filename
     ], capture_output=True)
@@ -76,7 +79,7 @@ def decode(p, remove=False):
     if proc.returncode != 0 or not os.path.exists(temporary_png_filename):
         return None
     else:
-        os.utime(temporary_png_filename, (time.time(), os.path.getmtime(p)))
+        os.utime(temporary_png_filename, (time.time(), os.path.getmtime(webp_filename)))
         return temporary_png_filename
 
 
@@ -108,7 +111,7 @@ def handle_file(filename, root):
     elif extension in ['gif']:
         lossy = arguments['lossygif']
     elif extension in ['webp']:
-        decoded_png_filename = decode(fullpath)
+        decoded_png_filename = convert_webp_to_temporary_png(fullpath)
         if decoded_png_filename is None:
             return
         if arguments['lossywebp']:
