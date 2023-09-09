@@ -171,6 +171,7 @@ def run():
         print('--lossyjpg: convert JPEG files lossily (-d 1) (default FALSE)')
         print('--lossywebp: convert lossless WebP lossily (-d 1) (default FALSE)')
         print('--lossygif: convert GIF lossily (-d 1) (default FALSE)')
+        print('--jobs: number of jobs (cjxl processes) to use (defaults to CPU core count)')
         print('--cjxl-extra-args: Additional parameters to pass to jxl, e.g. --cjxl-extra-args="-e 8" to set cjxl '
               'effort to 8')
         exit()
@@ -182,6 +183,7 @@ def run():
         'lossygif': False,
         'source': None,
         'cjxl_extra_args': [],
+        'jobs': cpu_count(),
     }
 
     skip_next_argument = False
@@ -198,6 +200,17 @@ def run():
                 arguments['lossywebp'] = True
             elif arg == '--lossygif':
                 arguments['lossygif'] = True
+            elif arg == '--jobs':
+                if i + 1 < len(sys.argv) - 1:
+                    try:
+                        arguments['jobs'] = int(sys.argv[i + 2])
+                        skip_next_argument = True
+                    except ValueError:
+                        print("Invalid value for --jobs. Must be an integer.")
+                        exit()
+                    if arguments['jobs'] < 1:
+                        print("Invalid value for --jobs. Must be greater than 0.")
+                        exit()
             elif arg == '--cjxl-extra-args':
                 # split the next argument and add to 'cjxl_extra_args'
                 if i + 1 < len(sys.argv) - 1:
@@ -213,7 +226,7 @@ def run():
         print('Missing directory to process.')
         exit()
 
-    pool = ThreadPool(cpu_count())
+    pool = ThreadPool(arguments['jobs'])
     for root, subdirs, files in os.walk(arguments['source']):
         for filename in files:
             pool.apply_async(try_handle_file, (filename, root))
