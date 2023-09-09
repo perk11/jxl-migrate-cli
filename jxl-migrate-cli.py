@@ -74,8 +74,6 @@ def decode(p, remove=False):
         return None
     else:
         os.utime(res, (time.time(), os.path.getmtime(p)))
-        if remove:
-            os.remove(p)
         return res
 def handle_file(filename, root):
     global fsbefore
@@ -83,73 +81,52 @@ def handle_file(filename, root):
     global arguments
 
     extension = filename.split('.')[-1].lower()
+
+    fullpath = os.path.join(root, filename)
+    filesize = os.path.getsize(fullpath)
+    lossy = False
+    losslessjpeg = False
+    decoded_png_filename = None
+    if extension not in ['jpg', 'jpeg', 'gif', 'png', 'apng', 'webp']:
+        if extension != 'jxl':
+            print('Not supported: ' + filename)
+        return
+
+    if extension in ['jpg', 'jpeg']:
+        lossy = arguments['lossyjpg']
+        losslessjpeg = not arguments['lossyjpg']
+    elif extension in ['gif']:
+        lossy = arguments['lossygif']
+    elif extension in ['webp']:
+        decoded_png_filename = decode(fullpath)
+        if decoded_png_filename is None:
+            return
+        if arguments['lossywebp']:
+            lossy = True
+        else:
+            lossy = not is_webp_lossless(fullpath)
+        fullpath = decoded_png_filename
     filename_without_extension = '.'.join(filename.split('.')[:-1])
     jxl_filename = os.path.join(root, filename_without_extension) + '.jxl'
     if os.path.exists(jxl_filename):
-        print(jxl_filename + ' already exists, skipping')
+        print(jxl_filename + ' already exists, skipping ' + filename)
         return
-
-    if extension in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
-        fullpath = os.path.join(root, filename)
-        filesize = os.path.getsize(fullpath)
-        fsbefore += filesize
-        print('    Found ' + fullpath)
-        if extension in ['jpg', 'jpeg']:
-            print('        Converting JPG to JXL')
-            ret = convert(fullpath, lossy=arguments['lossyjpg'], losslessjpeg=not arguments['lossyjpg'], remove=arguments['delete'])
-            if ret is not None:
-                filesize = os.path.getsize(ret)
-                fsafter += filesize
-            else:
-                print('        Conversion FAILED: ', fullpath)
-        elif extension in ['png']:
-            print('        Converting PNG to JXL')
-            ret = convert(fullpath, remove=arguments['delete'])
-            if ret is not None:
-                filesize = os.path.getsize(ret)
-                fsafter += filesize
-            else:
-                print('        Conversion FAILED: ', fullpath)
-        elif extension in ['apng']:
-            print('        Converting APNG to JXL')
-            ret = convert(fullpath, remove=arguments['delete'])
-            if ret is not None:
-                filesize = os.path.getsize(ret)
-                fsafter += filesize
-            else:
-                print('        Conversion FAILED: ', fullpath)
-        elif extension in ['gif']:
-            print('        Converting GIF to JXL')
-            ret = convert(fullpath, lossy=arguments['lossygif'], remove=arguments['delete'])
-            if ret is not None:
-                filesize = os.path.getsize(ret)
-                fsafter += filesize
-            else:
-                print('        Conversion FAILED: ', fullpath)
-        elif extension in ['webp']:
-            print('        Converting WebP to JXL')
-            webp_is_lossless = is_webp_lossless(fullpath)
-            ret = decode(fullpath, remove=arguments['delete'])
-            if ret is not None:
-                if webp_is_lossless:
-                    ret = convert(ret, lossy=arguments['lossywebp'], remove=True)
-                    if ret is not None:
-                        filesize = os.path.getsize(ret)
-                        fsafter += filesize
-                    else:
-                        print('        Conversion FAILED: ', fullpath)
-                else:
-                    ret = convert(ret, lossy=True, remove=True)
-                    if ret is not None:
-                        filesize = os.path.getsize(ret)
-                        fsafter += filesize
-                    else:
-                        print('        Conversion FAILED: ', fullpath)
-            else:
-                print('        Conversion FAILED: ', fullpath)
+    message = "Converting " + fullpath + " to "
+    if lossy:
+        message += "a lossy"
     else:
-        if (extension != 'jxl'):
-            print('    Not supported: ' + filename)
+        message += "a lossless"
+    message += " JXL"
+    print(message)
+    converted_filename = convert(fullpath, lossy, arguments['delete'], losslessjpeg)
+    if converted_filename is None:
+        print('Conversion FAILED: ', fullpath)
+    else:
+        fsbefore += filesize
+        fsafter += os.path.getsize(converted_filename)
+
+    if decoded_png_filename is not None:
+        os.remove(decoded_png_filename)
 def try_handle_file(filename, root):
     try:
         handle_file(filename, root)
