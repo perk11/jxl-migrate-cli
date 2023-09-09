@@ -208,6 +208,9 @@ def run():
     pool.close()
     pool.join()
 
+    if fsbefore == 0:
+        print('No files were converted')
+        exit()
     print('Before conversion: ' + str(fsbefore / 1024) + 'KB')
     print('After conversion: ' + str(fsafter / 1024) + 'KB')
     print('Reduction: ' + str((1 - fsafter / fsbefore) * 100) + '%')
