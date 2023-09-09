@@ -83,6 +83,12 @@ def handle_file(filename, root):
     global arguments
 
     extension = filename.split('.')[-1].lower()
+    filename_without_extension = '.'.join(filename.split('.')[:-1])
+    jxl_filename = os.path.join(root, filename_without_extension) + '.jxl'
+    if os.path.exists(jxl_filename):
+        print(jxl_filename + ' already exists, skipping')
+        return
+
     if extension in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
         fullpath = os.path.join(root, filename)
         filesize = os.path.getsize(fullpath)
