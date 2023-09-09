@@ -96,7 +96,12 @@ def handle_file(filename, root):
         if extension != 'jxl':
             print('Not supported: ' + filename)
         return
-
+    filename_without_extension = '.'.join(filename.split('.')[:-1])
+    jxl_filename = os.path.join(root, filename_without_extension) + '.jxl'
+    if not arguments['force_overwrite']:
+        if os.path.exists(jxl_filename):
+            print(jxl_filename + ' already exists, skipping ' + filename)
+            return
     if extension in ['jpg', 'jpeg']:
         lossy = arguments['lossyjpg']
         losslessjpeg = not arguments['lossyjpg']
@@ -111,11 +116,6 @@ def handle_file(filename, root):
         else:
             lossy = not is_webp_lossless(fullpath)
         fullpath = decoded_png_filename
-    filename_without_extension = '.'.join(filename.split('.')[:-1])
-    jxl_filename = os.path.join(root, filename_without_extension) + '.jxl'
-    if os.path.exists(jxl_filename):
-        print(jxl_filename + ' already exists, skipping ' + filename)
-        return
     message = "Converting " + fullpath + " to "
     if lossy:
         message += "a lossy"
@@ -156,6 +156,7 @@ def run():
         print('--lossyjpg: convert JPEG files lossily (-d 1) (default FALSE)')
         print('--lossywebp: convert lossless WebP lossily (-d 1) (default FALSE)')
         print('--lossygif: convert GIF lossily (-d 1) (default FALSE)')
+        print('--force-overwrite: perform conversion even if JXL file already exists')
         print('--jobs: number of jobs (cjxl processes) to use (defaults to CPU core count), e.g. --jobs=8')
         print('--cjxl-extra-args: Additional parameters to pass to jxl, e.g. --cjxl-extra-args="-e 8" to set cjxl '
               'effort to 8')
@@ -166,6 +167,7 @@ def run():
         'lossyjpg': False,
         'lossywebp': False,
         'lossygif': False,
+        'force_overwrite': False,
         'source': None,
         'cjxl_extra_args': [],
         'jobs': cpu_count(),
@@ -182,6 +184,8 @@ def run():
                 arguments['lossywebp'] = True
             elif arg == '--lossygif':
                 arguments['lossygif'] = True
+            elif arg == '--force-overwrite':
+                arguments['force_overwrite'] = True
             elif arg.startswith('--jobs='):
                 try:
                     arguments['jobs'] = int(arg.split('=')[1])
