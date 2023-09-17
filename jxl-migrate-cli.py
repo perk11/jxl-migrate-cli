@@ -96,7 +96,7 @@ def handle_file(filename, root):
     decoded_png_filename = None
     if extension not in ['jpg', 'jpeg', 'gif', 'png', 'apng', 'webp']:
         if extension != 'jxl':
-            print('Not supported: ' + filename)
+            print('Not supported: ' + fullpath)
         return
     filename_without_extension = '.'.join(filename.split('.')[:-1])
     jxl_filename = os.path.join(root, filename_without_extension) + '.jxl'
