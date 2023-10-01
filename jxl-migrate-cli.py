@@ -156,9 +156,8 @@ print_lock = Semaphore(value=1)
 
 
 def print_thread_safe(*args, sep=' ', end='\n', file=None):
-    print_lock.acquire()
-    print(*args, sep=sep, end=end, file=file)
-    print_lock.release()
+    with print_lock:
+        print(*args, sep=sep, end=end, file=file)
 
 
 def run():
