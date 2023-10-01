@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from threading import Semaphore
 
 version = 'v0.3'
 
@@ -66,7 +67,7 @@ def convert(p, target_filename, lossy=False, remove=False, losslessjpeg=False):
 def convert_webp_to_temporary_png(webp_filename):
     temporary_png_filename = tempfile.NamedTemporaryFile(prefix='jxl-migrate-cli-', suffix='.png').name
 
-    print("Converting " + webp_filename + " to a temporary PNG " + temporary_png_filename)
+    print_thread_safe("Converting " + webp_filename + " to a temporary PNG " + temporary_png_filename)
 
     proc = subprocess.run(args=[
         'dwebp',
@@ -96,13 +97,13 @@ def handle_file(filename, root):
     decoded_png_filename = None
     if extension not in ['jpg', 'jpeg', 'gif', 'png', 'apng', 'webp']:
         if extension != 'jxl':
-            print('Not supported: ' + fullpath)
+            print_thread_safe('Not supported: ' + fullpath)
         return
     filename_without_extension = '.'.join(filename.split('.')[:-1])
     jxl_filename = os.path.join(root, filename_without_extension) + '.jxl'
     if not arguments['force_overwrite']:
         if os.path.exists(jxl_filename):
-            print(jxl_filename + ' already exists, skipping ' + filename)
+            print_thread_safe(jxl_filename + ' already exists, skipping ' + filename)
             return
     if extension in ['jpg', 'jpeg']:
         lossy = arguments['lossyjpg']
@@ -124,11 +125,11 @@ def handle_file(filename, root):
     else:
         message += "a lossless"
     message += " JXL"
-    print(message)
+    print_thread_safe(message)
 
     converted_filename = convert(fullpath, jxl_filename, lossy, arguments['delete'], losslessjpeg)
     if converted_filename is None:
-        print('Conversion FAILED: ', fullpath)
+        print_thread_safe('Conversion FAILED: ', fullpath)
     else:
         filesize_before_conversion += filesize
         filesize_after_conversion += os.path.getsize(converted_filename)
@@ -141,7 +142,7 @@ def try_handle_file(filename, root):
     try:
         handle_file(filename, root)
     except Exception as inst:
-        print('Error processing ' + os.path.join(root, filename) + ': ', repr(inst))
+        print_thread_safe('Error processing ' + os.path.join(root, filename) + ': ', repr(inst))
 
 
 def format_file_size(size_in_bytes):
@@ -149,6 +150,15 @@ def format_file_size(size_in_bytes):
         if size_in_bytes < 1024.0:
             return f"{size_in_bytes:.3f} {unit}"
         size_in_bytes /= 1024.0
+
+
+print_lock = Semaphore(value=1)
+
+
+def print_thread_safe(*args, sep=' ', end='\n', file=None):
+    print_lock.acquire()
+    print(*args, sep=sep, end=end, file=file)
+    print_lock.release()
 
 
 def run():
