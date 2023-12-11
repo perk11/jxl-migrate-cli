@@ -122,6 +122,8 @@ def handle_file(filename, root):
     message = "Converting " + fullpath + " to "
     if lossy:
         message += "a lossy"
+    elif losslessjpeg:
+        message += "a recompressed reversible"
     else:
         message += "a lossless"
     message += " JXL"
