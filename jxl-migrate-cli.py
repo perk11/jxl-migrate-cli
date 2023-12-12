@@ -221,6 +221,10 @@ def run():
                 print('Unrecognized flag: ' + arg)
                 exit(1)
         else:
+            if arguments['source'] is not None:
+                print(f'Multiple arguments that can be interpreted as a source directory found: '
+                      f'"{arguments["source"]}", "{arg}".')
+                exit(1)
             arguments['source'] = arg
 
     source_directory = arguments['source']
