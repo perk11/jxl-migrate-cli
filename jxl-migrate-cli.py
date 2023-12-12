@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from threading import Semaphore
 
-version = 'v0.3.1'
+version = 'v0.3.2'
 
 '''
 jxl-migrate - Convert images to JPEG XL (JXL) format
@@ -167,23 +167,9 @@ def print_thread_safe(*args, sep=' ', end='\n', file=None):
 
 def run():
     global arguments
-    global version
 
     if len(sys.argv) <= 1:
-        print(f'jxl-migrate-cli {version} - Convert images in a directory to JPEG XL (JXL) format\n')
-
-        print('Program usage:')
-        print(sys.argv[0] + ' [directory] [OPTIONS]\n')
-        print('directory: the folder to process')
-        print('--delete: delete original source files if conversion succeeded (default FALSE)')
-        print('--lossyjpg: convert JPEG files lossily (-d 1) (default FALSE)')
-        print('--lossywebp: convert lossless WebP lossily (-d 1) (default FALSE)')
-        print('--lossygif: convert GIF lossily (-d 1) (default FALSE)')
-        print('--force-overwrite: perform conversion even if JXL file already exists')
-        print('--jobs: number of jobs (cjxl processes) to use (defaults to CPU core count), e.g. --jobs=8')
-        print('--cjxl-extra-args: Additional parameters to pass to jxl, e.g. --cjxl-extra-args="-e 8" to set cjxl '
-              'effort to 8')
-        exit()
+        print_help()
 
     arguments = {
         'delete': False,
@@ -197,6 +183,10 @@ def run():
     }
 
     for i, arg in enumerate(sys.argv[1:]):
+        if arg == '-h' or arg == '--help':
+            print_help()
+        elif arg == '-v' or arg =='-V' or arg == '--v' or arg == '--version':
+            print_version()
         if arg.startswith('--'):
             if arg == '--delete':
                 arguments['delete'] = True
@@ -253,6 +243,31 @@ def run():
     reduction_percentage = (1 - filesize_after_conversion / filesize_before_conversion) * 100
 
     print(f"Reduction: {reduction_percentage:.2f}%")
+
+
+def print_version():
+    global version
+    print(version)
+    exit()
+
+
+def print_help():
+    global version
+    print(f'jxl-migrate-cli {version} - Convert images in a directory to JPEG XL (JXL) format\n')
+    print('Program usage:')
+    print(sys.argv[0] + ' [directory] [OPTIONS]\n')
+    print('directory: the folder to process\n')
+    print('--help: print this message and exit')
+    print('--version: print version and exit')
+    print('--delete: delete original source files if conversion succeeded (default FALSE)')
+    print('--lossyjpg: convert JPEG files lossily (-d 1) (default FALSE)')
+    print('--lossywebp: convert lossless WebP lossily (-d 1) (default FALSE)')
+    print('--lossygif: convert GIF lossily (-d 1) (default FALSE)')
+    print('--force-overwrite: perform conversion even if JXL file already exists')
+    print('--jobs: number of jobs (cjxl processes) to use (defaults to CPU core count), e.g. --jobs=8')
+    print('--cjxl-extra-args: Additional parameters to pass to jxl, e.g. --cjxl-extra-args="-e 8" to set cjxl '
+          'effort to 8')
+    exit()
 
 
 if __name__ == '__main__':
