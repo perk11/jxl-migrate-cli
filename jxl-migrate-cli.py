@@ -92,6 +92,9 @@ def handle_file(filename, root):
 
     fullpath = os.path.join(root, filename)
     filesize = os.path.getsize(fullpath)
+    if filesize == 0:
+        print_thread_safe('Skipping zero-byte file ' + fullpath)
+        return
     lossy = False
     losslessjpeg = False
     decoded_png_filename = None
