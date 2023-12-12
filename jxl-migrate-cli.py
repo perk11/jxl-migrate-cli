@@ -211,21 +211,21 @@ def run():
                     arguments['jobs'] = int(arg.split('=')[1])
                 except ValueError:
                     print('Invalid value for --jobs. Must be an integer.')
-                    exit()
+                    exit(1)
                 if arguments['jobs'] < 1:
                     print('Invalid value for --jobs. Must be greater than 0.')
-                    exit()
+                    exit(1)
             elif arg.startswith('--cjxl-extra-args='):
                 arguments['cjxl_extra_args'] = arg.split('=')[1].split(' ')
             else:
                 print('Unrecognized flag: ' + arg)
-                exit()
+                exit(1)
         else:
             arguments['source'] = arg
 
     if arguments['source'] is None:
         print('Missing directory to process.')
-        exit()
+        exit(1)
 
     pool = ThreadPool(arguments['jobs'])
     for root, subdirs, files in os.walk(arguments['source']):
