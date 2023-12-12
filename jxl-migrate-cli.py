@@ -134,7 +134,7 @@ def handle_file(filename, root):
 
     converted_filename = convert(fullpath, jxl_filename, lossy, arguments['delete'], losslessjpeg)
     if converted_filename is None:
-        print_thread_safe('Conversion FAILED: ', fullpath)
+        print_thread_safe('Conversion FAILED: ' + fullpath)
     else:
         filesize_before_conversion += filesize
         filesize_after_conversion += os.path.getsize(converted_filename)
