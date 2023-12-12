@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from threading import Semaphore
 
-version = 'v0.3'
+version = 'v0.3.1'
 
 '''
 jxl-migrate - Convert images to JPEG XL (JXL) format
