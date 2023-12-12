@@ -223,8 +223,13 @@ def run():
         else:
             arguments['source'] = arg
 
-    if arguments['source'] is None:
+    source_directory = arguments['source']
+    if source_directory is None:
         print('Missing directory to process.')
+        exit(1)
+
+    if not os.access(source_directory, os.W_OK | os.X_OK | os.R_OK):
+        print(f'Failed to open directory "{source_directory}" for reading and writing')
         exit(1)
 
     pool = ThreadPool(arguments['jobs'])
