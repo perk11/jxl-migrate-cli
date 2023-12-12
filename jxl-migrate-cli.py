@@ -194,7 +194,6 @@ def run():
         'jobs': cpu_count(),
     }
 
-    skip_next_argument = False
     for i, arg in enumerate(sys.argv[1:]):
         if arg.startswith('--'):
             if arg == '--delete':
