@@ -169,10 +169,9 @@ def run():
     global arguments
     global version
 
-    print('jxl-migrate-cli - Convert images in a directory to JPEG XL (JXL) format\n')
-    print(version)
-
     if len(sys.argv) <= 1:
+        print(f'jxl-migrate-cli {version} - Convert images in a directory to JPEG XL (JXL) format\n')
+
         print('Program usage:')
         print(sys.argv[0] + ' [directory] [OPTIONS]\n')
         print('directory: the folder to process')
